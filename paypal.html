@@ -222,19 +222,19 @@
             </ul>
         </div>
     </div>
-
+    
     <div class="container">
-        <div class="search-box" id="searchBox">
-            <input type="text" class="search-input" id="username" placeholder="@username">
-            <button class="search-button" onclick="searchAccount()">Search</button>
+        <div class="search-box">
+            <input type="text" class="search-input" value="@" placeholder="@username">
+            <button class="search-button">Search</button>
         </div>
-        <div class="search-box" id="amountBox" style="display:none;">
-            <input type="number" class="search-input" id="amount" placeholder="$">
+        <div class="search-box">
+            <input type="number" class="search-input" id="transferAmount" placeholder="$">
             <button class="transfer-button" onclick="startTransaction()">Transfer</button>
         </div>
-        <div class="balance-box" id="balanceBox" style="display:none;">
+        <div class="balance-box">
             <img src="aa.png" alt="Small Image" width="80">
-            <p class="balance-text">Available Balance: $777,275,566</p>
+            <p class="balance-text">Available Balance: $<span id="balanceAmount">777275566</span></p>
         </div>
     </div>
 
@@ -259,30 +259,16 @@
     <!-- Popup -->
     <div class="popup" id="popup">
         <div class="popup-content">
-            <img src="la.jpg" alt="Success Image" width="60" style="margin-bottom: 20px;">
+            <img src="la.jpg" alt="Success Image" width="60" style="margin-bottom: 10px;">
             <p>Your transaction of $<span id="transactionAmount"></span> was successful!</p>
             <p>You will receive $<span id="receivedAmount"></span> after some time.</p>
-            <img src="a.png" alt="Small Image" width="80" style="margin-top: 20px;">
+            <p>New Balance: $<span id="newBalance"></span></p>
             <button class="popup-button" onclick="goToHomePage()">Go to Home Page</button>
         </div>
     </div>
 
     <script>
-        function searchAccount() {
-            // Show the loader
-            document.getElementById('loader').style.display = 'flex';
-
-            // Simulate an account search delay
-            setTimeout(function() {
-                // Hide the loader
-                document.getElementById('loader').style.display = 'none';
-
-                // Show the amount input box and balance box
-                document.getElementById('searchBox').style.display = 'none';
-                document.getElementById('amountBox').style.display = 'flex';
-                document.getElementById('balanceBox').style.display = 'flex';
-            }, 2000); // 2 seconds delay for demonstration
-        }
+        let balance = 777275566;
 
         function startTransaction() {
             // Show the loader
@@ -299,16 +285,24 @@
         }
 
         function showPopup() {
-            var amount = document.getElementById('amount').value;
+            var amount = document.getElementById('transferAmount').value;
+            var receivedAmount = amount - (amount * 0.02); // Example fee deduction
+
+            // Update balance
+            balance -= amount;
+
+            // Show transaction details
             document.getElementById('transactionAmount').innerText = amount;
-            document.getElementById('receivedAmount').innerText = amount - (amount * 0.02); // Example fee deduction
+            document.getElementById('receivedAmount').innerText = receivedAmount.toFixed(2);
+            document.getElementById('newBalance').innerText = balance.toFixed(2);
+            document.getElementById('balanceAmount').innerText = balance.toFixed(2);
+
+            // Show popup
             document.getElementById('popup').style.display = 'flex';
         }
 
         function goToHomePage() {
             document.getElementById('popup').style.display = 'none';
-            // Optionally, redirect to the home page
-            window.location.href = 'https://www.paypal.com/';
         }
     </script>
 </body>
