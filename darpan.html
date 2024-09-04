@@ -225,7 +225,7 @@
     
     <div class="container">
         <div class="search-box">
-            <input type="text" class="search-input" value="@" placeholder="@username">
+            <input type="text" class="search-input" id="username" placeholder="@username">
             <button class="search-button">Search</button>
         </div>
         <div class="search-box">
@@ -270,7 +270,7 @@
     <!-- Confirm Popup -->
     <div class="confirm-popup" id="confirmPopup">
         <div class="confirm-popup-content">
-            <p>Are you sure you want to transfer $<span id="confirmAmount"></span>?</p>
+            <p>Do you want to confirm the transfer of $<span id="confirmAmount"></span> to <span id="confirmUsername"></span>? Click on the button to confirm.</p>
             <button class="confirm-popup-button" onclick="proceedTransaction()">Confirm</button>
             <button class="confirm-popup-button" onclick="cancelTransaction()">Cancel</button>
         </div>
@@ -281,13 +281,16 @@
 
         function confirmTransaction() {
             var amount = document.getElementById('transferAmount').value;
-            if (amount <= 0 || isNaN(amount)) {
-                alert('Please enter a valid amount.');
+            var username = document.getElementById('username').value;
+
+            if (amount <= 0 || isNaN(amount) || username.trim() === '') {
+                alert('Please enter a valid amount and username.');
                 return;
             }
 
             // Show confirmation popup
             document.getElementById('confirmAmount').innerText = amount;
+            document.getElementById('confirmUsername').innerText = username;
             document.getElementById('confirmPopup').style.display = 'flex';
         }
 
