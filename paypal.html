@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayPal Transfer Process</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            background-color: #2507cc;
+            width: 100%;
+            padding: 15px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            width: 90%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: #fff;
+            font-size: 28px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .nav-buttons {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            margin: 0;
+        }
+
+        .nav-buttons li {
+            margin-left: 20px;
+        }
+
+        .nav-buttons a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        .search-button, .transfer-button, .confirm-button {
+            padding: 12px 20px;
+            background-color: #2e03f0e7;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .balance-box {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .balance-text {
+            font-size: 18px;
+            margin: 20px 0;
+        }
+
+        /* Popup */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .popup-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .popup-button {
+            margin-top: 20px;
+            padding: 12px 20px;
+            background-color: #1b04eb;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <a href="https://www.paypal.com/" target="_blank">
+                <img src="https://pngimg.com/d/paypal_PNG4.png" alt="PayPal Logo" width="120">
+            </a>
+            <ul class="nav-buttons">
+                <li><a href="#">Home</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Security</a></li>
+                <li><a href="#">Settings</a></li>
+                <li><a href="#">Login</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="search-box" id="searchBox">
+            <input type="text" class="search-input" id="accountName" value="@" placeholder="@username">
+            <button class="search-button" onclick="searchAccount()">Search</button>
+        </div>
+
+        <div id="transferSection" class="hidden">
+            <p>Account <strong id="foundAccountName"></strong> found successfully. Please input the amount that you want to transfer:</p>
+            <div class="search-box">
+                <input type="number" class="search-input" id="transferAmount" placeholder="$">
+                <button class="transfer-button" onclick="prepareTransfer()">Transfer</button>
+            </div>
+        </div>
+
+        <div id="confirmSection" class="hidden">
+            <p>The amount $<strong id="amountToTransfer"></strong> is ready to be transferred. Click confirm to proceed.</p>
+            <button class="confirm-button" onclick="confirmTransfer()">Confirm</button>
+        </div>
+
+        <div id="resultSection" class="hidden">
+            <p>The amount $<strong id="transferredAmount"></strong> has been successfully transferred to account <strong id="finalAccountName"></strong>.</p>
+            <p>New Balance: $<span id="newBalance"></span></p>
+        </div>
+    </div>
+
+    <script>
+        let balance = 777275566;
+        let accountName = "";
+
+        function searchAccount() {
+            accountName = document.getElementById('accountName').value;
+            document.getElementById('foundAccountName').innerText = accountName;
+
+            // Show transfer section and hide search box
+            document.getElementById('searchBox').classList.add('hidden');
+            document.getElementById('transferSection').classList.remove('hidden');
+        }
+
+        function prepareTransfer() {
+            var amount = document.getElementById('transferAmount').value;
+            document.getElementById('amountToTransfer').innerText = amount;
+
+            // Show confirm section and hide transfer section
+            document.getElementById('transferSection').classList.add('hidden');
+            document.getElementById('confirmSection').classList.remove('hidden');
+        }
+
+        function confirmTransfer() {
+            var amount = parseFloat(document.getElementById('amountToTransfer').innerText);
+            balance -= amount;
+
+            // Show result section and hide confirm section
+            document.getElementById('confirmSection').classList.add('hidden');
+            document.getElementById('resultSection').classList.remove('hidden');
+
+            // Update the result section with final details
+            document.getElementById('transferredAmount').innerText = amount.toFixed(2);
+            document.getElementById('finalAccountName').innerText = accountName;
+            document.getElementById('newBalance').innerText = balance.toFixed(2);
+        }
+    </script>
+</body>
+</html>
