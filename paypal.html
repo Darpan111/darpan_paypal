@@ -66,6 +66,7 @@
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
         }
 
         .search-box {
@@ -110,16 +111,16 @@
 
         /* Popup */
         .popup {
-            display: none;
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 9999;
-            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 10;
         }
 
         .popup-content {
@@ -129,6 +130,7 @@
             box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
             text-align: center;
             max-width: 400px;
+            z-index: 11;
         }
 
         .popup-button {
@@ -140,6 +142,11 @@
             border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
+        }
+
+        /* Overlapping Styles */
+        .popup-hidden {
+            display: none;
         }
     </style>
 </head>
@@ -160,27 +167,37 @@
     </div>
     
     <div class="container">
+        <!-- Initial Search Box -->
         <div class="search-box" id="searchBox">
             <input type="text" class="search-input" id="accountName" value="@" placeholder="@username">
             <button class="search-button" onclick="searchAccount()">Search</button>
         </div>
 
-        <div id="transferSection" class="hidden">
-            <p>Account <strong id="foundAccountName"></strong> found successfully. Please input the amount that you want to transfer:</p>
-            <div class="search-box">
-                <input type="number" class="search-input" id="transferAmount" placeholder="$">
-                <button class="transfer-button" onclick="prepareTransfer()">Transfer</button>
+        <!-- Overlapping Popup 1 (Transfer Section) -->
+        <div class="popup popup-hidden" id="transferPopup">
+            <div class="popup-content">
+                <p>Account <strong id="foundAccountName"></strong> found successfully. Please input the amount that you want to transfer:</p>
+                <div class="search-box">
+                    <input type="number" class="search-input" id="transferAmount" placeholder="$">
+                    <button class="transfer-button" onclick="prepareTransfer()">Transfer</button>
+                </div>
             </div>
         </div>
 
-        <div id="confirmSection" class="hidden">
-            <p>The amount $<strong id="amountToTransfer"></strong> is ready to be transferred. Click confirm to proceed.</p>
-            <button class="confirm-button" onclick="confirmTransfer()">Confirm</button>
+        <!-- Overlapping Popup 2 (Confirm Section) -->
+        <div class="popup popup-hidden" id="confirmPopup">
+            <div class="popup-content">
+                <p>The amount $<strong id="amountToTransfer"></strong> is ready to be transferred. Click confirm to proceed.</p>
+                <button class="confirm-button" onclick="confirmTransfer()">Confirm</button>
+            </div>
         </div>
 
-        <div id="resultSection" class="hidden">
-            <p>The amount $<strong id="transferredAmount"></strong> has been successfully transferred to account <strong id="finalAccountName"></strong>.</p>
-            <p>New Balance: $<span id="newBalance"></span></p>
+        <!-- Overlapping Popup 3 (Final Result Section) -->
+        <div class="popup popup-hidden" id="resultPopup">
+            <div class="popup-content">
+                <p>The amount $<strong id="transferredAmount"></strong> has been successfully transferred to account <strong id="finalAccountName"></strong>.</p>
+                <p>New Balance: $<span id="newBalance"></span></p>
+            </div>
         </div>
     </div>
 
@@ -192,29 +209,28 @@
             accountName = document.getElementById('accountName').value;
             document.getElementById('foundAccountName').innerText = accountName;
 
-            // Show transfer section and hide search box
-            document.getElementById('searchBox').classList.add('hidden');
-            document.getElementById('transferSection').classList.remove('hidden');
+            // Show transfer popup and hide search box
+            document.getElementById('transferPopup').classList.remove('popup-hidden');
         }
 
         function prepareTransfer() {
             var amount = document.getElementById('transferAmount').value;
             document.getElementById('amountToTransfer').innerText = amount;
 
-            // Show confirm section and hide transfer section
-            document.getElementById('transferSection').classList.add('hidden');
-            document.getElementById('confirmSection').classList.remove('hidden');
+            // Show confirm popup and hide transfer popup
+            document.getElementById('transferPopup').classList.add('popup-hidden');
+            document.getElementById('confirmPopup').classList.remove('popup-hidden');
         }
 
         function confirmTransfer() {
             var amount = parseFloat(document.getElementById('amountToTransfer').innerText);
             balance -= amount;
 
-            // Show result section and hide confirm section
-            document.getElementById('confirmSection').classList.add('hidden');
-            document.getElementById('resultSection').classList.remove('hidden');
+            // Show result popup and hide confirm popup
+            document.getElementById('confirmPopup').classList.add('popup-hidden');
+            document.getElementById('resultPopup').classList.remove('popup-hidden');
 
-            // Update the result section with final details
+            // Update the result popup with final details
             document.getElementById('transferredAmount').innerText = amount.toFixed(2);
             document.getElementById('finalAccountName').innerText = accountName;
             document.getElementById('newBalance').innerText = balance.toFixed(2);
